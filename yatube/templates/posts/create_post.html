@@ -15,7 +15,6 @@
               {% else %}
                 Добавить запись
               {% endif %}
-              {% comment %}is_edit передаются из вью post_edit{% endcomment %}
             </div>
             <div class="card-body">
               <form method="post" action="{% url 'posts:post_create' %}">
