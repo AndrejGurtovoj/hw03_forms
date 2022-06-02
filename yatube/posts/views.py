@@ -22,16 +22,13 @@ def index(request):
 
 def group_posts(request, slug):
     templates = 'posts/group_list.html'
+    post_list = Post.objects.all().order_by('-pub_date')
     group = get_object_or_404(Group, slug=slug)
-    text = 'Записи сообщества'
-    paginator = Paginator(group_posts, 10)
+    paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    posts = Post.objects.filter(group=group).order_by('-pub_date')[:10]
     context = {
         'group': group,
-        'posts': posts,
-        'text': text,
         'page_obj': page_obj
     }
     return render(request, templates, context)
