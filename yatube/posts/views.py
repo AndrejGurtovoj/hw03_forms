@@ -5,11 +5,13 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Post, Group, User
 from .forms import PostForm
 
+NUMBER_OF_POSTS = 10
+
 
 def index(request):
     templates = 'posts/index.html'
-    post_list = Post.objects.all().order_by('-pub_date')
-    paginator = Paginator(post_list, 10)
+    post_list = Post.objects.all()
+    paginator = Paginator(post_list, NUMBER_OF_POSTS)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     title = 'Это главная страница проекта Yatube'
@@ -22,9 +24,9 @@ def index(request):
 
 def group_posts(request, slug):
     templates = 'posts/group_list.html'
-    post_list = Post.objects.all().order_by('-pub_date')
+    post_list = Post.objects.all()
     group = get_object_or_404(Group, slug=slug)
-    paginator = Paginator(post_list, 10)
+    paginator = Paginator(post_list, NUMBER_OF_POSTS)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
@@ -35,39 +37,36 @@ def group_posts(request, slug):
 
 
 def profile(request, username):
-    user = User.objects.get(username=username)
-    posts = Post.objects.filter(author=user)
-    paginator = Paginator(posts, 10)
-    page_number = request.GET.get('page')
+    template = "posts/profile.html"
+    author = User.objects.get(username=username)
+    post_list = Post.objects.filter(author=author)
+    paginator = Paginator(post_list, NUMBER_OF_POSTS)
+    post_count = post_list.count()
+    page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-    count = Post.objects.filter(author=user).count()
     context = {
-        'page_obj': page_obj,
-        'author': user,
-        'count': count,
+        "page_obj": page_obj,
+        "title": f"Профайл пользователя {username}",
+        "author": author,
+        "post_count": post_count,
     }
-    return render(request, 'posts/profile.html', context)
+    return render(request, template, context)
 
 
 def post_detail(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-    text = post.text
-    text_title = text[:30]
-    pub_date = post.pub_date
-    author = post.author
-    name = author.get_full_name()
-    count_posts = author.posts.all().count()
+    template = "posts/post_detail.html"
+    post = Post.objects.get(id=post_id)
     group = post.group
+    title = post.text[0:29]
+    post_count = Post.objects.filter(author=post.author).count()
     context = {
-        'text': text,
-        'pub_date': pub_date,
-        'name': name,
-        'count_posts': count_posts,
-        'author': author,
-        'group': group,
-        'text_title': text_title,
+        "post": post,
+        "title": f"Пост {title}",
+        "group": group,
+        "post_count": post_count,
+        "username": request.user.username,
     }
-    return render(request, 'posts/post_detail.html', context)
+    return render(request, template, context)
 
 
 @login_required
