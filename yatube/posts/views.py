@@ -5,13 +5,13 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Post, Group, User
 from .forms import PostForm
 
-NUMBER_OF_POSTS = 10
+POSTS_PER_PAGE = 10
 
 
 def index(request):
     templates = 'posts/index.html'
-    post_list = Post.objects.all()
-    paginator = Paginator(post_list, NUMBER_OF_POSTS)
+    posts = Post.objects.all()
+    paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     title = 'Это главная страница проекта Yatube'
@@ -26,7 +26,7 @@ def group_posts(request, slug):
     templates = 'posts/group_list.html'
     post_list = Post.objects.all()
     group = get_object_or_404(Group, slug=slug)
-    paginator = Paginator(post_list, NUMBER_OF_POSTS)
+    paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
@@ -40,7 +40,7 @@ def profile(request, username):
     template = "posts/profile.html"
     author = User.objects.get(username=username)
     post_list = Post.objects.filter(author=author)
-    paginator = Paginator(post_list, NUMBER_OF_POSTS)
+    paginator = Paginator(post_list, 10)
     post_count = post_list.count()
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
