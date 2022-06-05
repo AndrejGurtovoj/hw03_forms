@@ -8,27 +8,27 @@ from .forms import PostForm
 POSTS_PER_PAGE = 10
 
 
+def page(request, posts):
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    return paginator.get_page(page_number)
+
+
 def index(request):
     templates = 'posts/index.html'
     posts = Post.objects.all()
-    paginator = Paginator(posts, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    title = 'Это главная страница проекта Yatube'
+    page_obj = page(request, posts)
     context = {
         'page_obj': page_obj,
-        'title': title
+
     }
     return render(request, templates, context)
 
 
 def group_posts(request, slug):
     templates = 'posts/group_list.html'
-    post_list = Post.objects.all()
+    page_obj = page
     group = get_object_or_404(Group, slug=slug)
-    paginator = Paginator(post_list, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
     context = {
         'group': group,
         'page_obj': page_obj
@@ -41,14 +41,10 @@ def profile(request, username):
     author = User.objects.get(username=username)
     post_list = Post.objects.filter(author=author)
     paginator = Paginator(post_list, 10)
-    post_count = post_list.count()
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     context = {
         "page_obj": page_obj,
-        "title": f"Профайл пользователя {username}",
-        "author": author,
-        "post_count": post_count,
     }
     return render(request, template, context)
 
@@ -56,15 +52,10 @@ def profile(request, username):
 def post_detail(request, post_id):
     template = "posts/post_detail.html"
     post = Post.objects.get(id=post_id)
-    group = post.group
-    title = post.text[0:29]
     post_count = Post.objects.filter(author=post.author).count()
     context = {
         "post": post,
-        "title": f"Пост {title}",
-        "group": group,
         "post_count": post_count,
-        "username": request.user.username,
     }
     return render(request, template, context)
 
