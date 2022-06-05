@@ -26,7 +26,7 @@ def index(request):
 def group_posts(request, slug):
     templates = 'posts/group_list.html'
     page_obj = page
-    group = get_object_or_404(Group, slug=slug)
+    group = get_object_or_404(Group, slug=slug('page'))
     context = {
         'group': group,
         'page_obj': page_obj
