@@ -5,8 +5,6 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Post, Group, User
 from .forms import PostForm
 
-POSTS_PER_PAGE = 10
-
 
 def page(request, posts):
     paginator = Paginator(posts, 10)
@@ -39,10 +37,7 @@ def group_posts(request, slug):
 def profile(request, username):
     template = "posts/profile.html"
     author = User.objects.get(username=username)
-    post_list = Post.objects.filter(author=author)
-    paginator = Paginator(post_list, 10)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
+    page_obj = Post.objects.filter(author=author)
     context = {
         "page_obj": page_obj,
     }
