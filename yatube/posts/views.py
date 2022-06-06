@@ -37,8 +37,8 @@ def group_posts(request, slug):
 
 def profile(request, username):
     template = "posts/profile.html"
-    posts = Post.objects.all()
-    author = User.objects.get(username=username)
+    author = get_object_or_404(User, username=username)
+    posts = author.posts.all().order_by("-pub_date")
     page_obj = page(request, posts)
     context = {
         'page_obj': page_obj,
