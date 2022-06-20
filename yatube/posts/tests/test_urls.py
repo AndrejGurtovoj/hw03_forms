@@ -23,6 +23,7 @@ class PostURLTests(TestCase):
 
     def setUp(self):
         self.guest_client = Client()
+        self.user = User.objects.create_user(username='NoName')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.post.author)
 
